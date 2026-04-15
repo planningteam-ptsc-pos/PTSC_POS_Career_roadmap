@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oil & Gas Career Pro Navigator | Professional Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cấu hình Tailwind lấy màu động từ CSS Variables -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: 'rgb(var(--color-primary-50) / <alpha-value>)',
+                            100: 'rgb(var(--color-primary-100) / <alpha-value>)',
+                            400: 'rgb(var(--color-primary-400) / <alpha-value>)',
+                            500: 'rgb(var(--color-primary-500) / <alpha-value>)',
+                            600: 'rgb(var(--color-primary-600) / <alpha-value>)',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        /* --- HỆ THỐNG THEME ĐA SẮC ĐỘNG --- */
+        :root {
+            /* Default: Ocean Blue */
+            --color-primary-50: 240 249 255;
+            --color-primary-100: 224 242 254;
+            --color-primary-400: 56 189 248;
+            --color-primary-500: 14 165 233;
+            --color-primary-600: 2 132 199;
+            --sky-primary: #0ea5e9;
+            --amber-peak: #f59e0b;
+            --oil-slate: #0f172a;
+        }
+
+        [data-theme="emerald"] {
+            --color-primary-50: 236 253 245;
+            --color-primary-100: 209 250 229;
+            --color-primary-400: 52 211 153;
+            --color-primary-500: 16 185 129;
+            --color-primary-600: 5 150 105;
+            --sky-primary: #10b981;
+        }
+
+        [data-theme="violet"] {
+            --color-primary-50: 245 243 255;
+            --color-primary-100: 237 233 254;
+            --color-primary-400: 167 139 250;
+            --color-primary-500: 139 92 246;
+            --color-primary-600: 124 58 237;
+            --sky-primary: #8b5cf6;
+        }
+
+        [data-theme="rose"] {
+            --color-primary-50: 255 241 242;
+            --color-primary-100: 255 228 230;
+            --color-primary-400: 251 113 133;
+            --color-primary-500: 244 63 94;
+            --color-primary-600: 225 29 72;
+            --sky-primary: #f43f5e;
+        }
+
+        [data-theme="amber"] {
+            --color-primary-50: 255 251 235;
+            --color-primary-100: 254 243 199;
+            --color-primary-400: 251 191 36;
+            --color-primary-500: 245 158 11;
+            --color-primary-600: 217 119 6;
+            --sky-primary: #f59e0b;
+        }
+
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            color: var(--oil-slate);
+            transition: all 0.5s ease; /* Mượt mà khi đổi theme */
+        }
+
+        .bg-fixed-overlay {
+            position: fixed; top: 0vh; bottom: 0vh; left: -2vw; right: -2vw;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
+            z-index: -1; transition: background-image 1s ease-in-out; pointer-events: none;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        /* --- ROADMAP VIEWPORT --- */
+        .roadmap-viewport {
+            position: relative; width: 100%; height: 100%; overflow: hidden; 
+            border-radius: 40px; background: radial-gradient(circle at top right, #ffffff 0%, #f0f4f8 100%);
+            border: 2px solid #fff; box-shadow: inset 0 0 50px rgba(255,255,255,0.8);
+        }
+
+        .bg-grid-pattern {
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px; position: absolute; inset: 0; opacity: 0.4; z-index: 0; pointer-events: none;
+        }
+
+        .waves-container {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 200px;
+            z-index: 0; pointer-events: none;
+        }
+        .wave {
+            position: absolute; bottom: 0; left: 0; width: 200%; height: 100%;
+            background-color: var(--sky-primary); opacity: 0.12; transition: background-color 0.5s ease;
+            -webkit-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 200"><path fill="white" d="M0,100 C300,50 500,150 800,100 C1100,50 1300,150 1600,100 L1600,200 L0,200 Z"/></svg>') repeat-x;
+            mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 200"><path fill="white" d="M0,100 C300,50 500,150 800,100 C1100,50 1300,150 1600,100 L1600,200 L0,200 Z"/></svg>') repeat-x;
+            animation: waveFlow 20s infinite linear;
+        }
+        .wave2 { bottom: 6px; animation: waveFlow 28s infinite linear reverse; opacity: 0.08; }
+        @keyframes waveFlow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .ambient-particle {
+            position: absolute; border-radius: 50%;
+            pointer-events: none; opacity: 0; filter: blur(1.5px); z-index: 1;
+            animation: floatParticle 22s infinite linear;
+        }
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0) scale(0.8); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) translateX(60px) scale(1.2); opacity: 0; }
+        }
+
+        .roadmap-content { position: relative; width: 100%; height: 100%; z-index: 2; }
+
+        .path-node {
+            position: absolute; transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            opacity: 0; transform: scale(0.8); z-index: 100;
+        }
+        .path-node.show { opacity: 1; transform: scale(1); }
+
+        .node-card {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+            padding: 10px; border-radius: 24px; width: 180px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.04); border: 2px solid rgba(255,255,255,0.8);
+            position: relative; cursor: pointer; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 auto; transform-origin: center center; overflow: visible;
+        }
+
+        .node-card:hover { transform: scale(1.05) translateY(-5px) !important; box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+
+        .node-card.active-glow {
+            border-color: var(--sky-primary) !important;
+            box-shadow: 0 0 35px rgb(var(--color-primary-500) / 0.4) !important;
+            transform: scale(1.05) !important; background: #fff !important;
+        }
+
+        .node-card.summit-victory {
+            border-color: var(--amber-peak) !important;
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.5) !important;
+            transform: scale(1.1) !important; background: #fff !important;
+        }
+
+        .node-icon-wrapper {
+            background: white; border-radius: 18px; padding: 4px; box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            border: 2px solid #f8fafc; display: flex; align-items: center; justify-content: center;
+            position: relative; width: 100%; height: 115px; margin-bottom: 8px; overflow: hidden;
+        }
+
+        .node-circle {
+            width: 32px; height: 32px; border-radius: 50%; color: white;
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px;
+            position: absolute; top: -12px; right: -12px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); z-index: 120;
+        }
+
+        .summit-crown {
+            position: absolute; top: -15px; right: -15px; width: 38px; height: 38px; background: var(--amber-peak);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 3px solid #fff; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4); color: white; z-index: 120;
+        }
+
+        #journeyLine { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+        
+        .path-glow { stroke: url(#lineGradient); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 8px rgb(var(--color-primary-500) / 0.5)); transition: stroke 0.5s ease; }
+
+        .summit-halo {
+            position: absolute; width: 300px; height: 300px; background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%);
+            border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: -1; animation: pulseRotate 6s linear infinite;
+        }
+        @keyframes pulseRotate {
+            0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1) rotate(180deg); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1) rotate(360deg); opacity: 0.3; }
+        }
+
+        /* --- SIDEBAR PAGE 1.5 --- */
+        .sidebar-container { display: flex; flex-direction: column; gap: 1.5rem; padding: 10px 0; min-height: min-content; }
+        .glass-card-info {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 28px; padding: 20px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.02); transition: all 0.3s ease; flex-shrink: 0;
+        }
+        .glass-card-info:hover { transform: translateX(-6px); background: #fff; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05); }
+        
+        .info-item-list { display: flex; gap: 15px; margin-bottom: 14px; font-size: 15px; font-weight: 600; line-height: 1.7; color: #475569; align-items: flex-start; }
+        .info-item-list:last-child { margin-bottom: 0; }
+        .dot { margin-top: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--sky-primary); flex-shrink: 0; transition: background 0.5s ease; }
+        
+        .job-family-badge {
+            background: linear-gradient(135deg, var(--sky-primary) 0%, #6366f1 100%);
+            color: white; padding: 22px; border-radius: 24px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.25);
+            position: relative; overflow: hidden; flex-shrink: 0; transition: background 0.5s ease;
+        }
+
+        /* --- PAGE 2 DASHBOARD STEPPER --- */
+        .detail-stepper-container { position: relative; padding: 5px 0 10px 0; }
+        .detail-stepper-container::before { content: ''; position: absolute; left: 31px; top: 25px; bottom: 25px; width: 2px; background: #e2e8f0; z-index: 1; }
+        .progress-line { position: absolute; left: 31px; top: 25px; width: 2px; background: var(--sky-primary); z-index: 2; transition: all 0.6s ease; }
+
+        .dashboard-stepper-item {
+            position: relative; padding: 8px 10px 8px 50px; border-radius: 16px; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; gap: 10px; margin-bottom: 4px; z-index: 10;
+        }
+        .dashboard-stepper-item.active { background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.04); border: 1.5px solid rgb(var(--color-primary-500) / 0.2); }
+        .stepper-num {
+            position: absolute; left: 15px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: white; color: #94a3b8;
+            display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; border: 2px solid #e2e8f0; z-index: 15; transition: all 0.3s ease;
+        }
+        .completed .stepper-num { background: var(--sky-primary); color: white; border-color: var(--sky-primary); }
+        .active .stepper-num { background: white; color: var(--sky-primary); border-color: var(--sky-primary); box-shadow: 0 0 10px rgb(var(--color-primary-500) / 0.3); }
+
+        .sidebar-dynamic-card {
+            background: linear-gradient(135deg, var(--sky-primary) 0%, #6366f1 100%);
+            border-radius: 28px; padding: 22px; color: white; margin-top: 10px; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2); transition: background 0.5s ease;
+        }
+        .dynamic-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .dynamic-content-list { font-size: 15px; font-weight: 600; line-height: 1.8; font-style: italic; opacity: 0.95; }
+        .dynamic-bullet { display: flex; gap: 12px; margin-bottom: 10px; align-items: flex-start; }
+        .white-dot { margin-top: 7px; width: 5px; height: 5px; border-radius: 50%; background: white; flex-shrink: 0; }
+
+        .responsibility-card {
+            background: white; padding: 18px 22px; border-radius: 18px; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 18px; box-shadow: 0 3px 10px rgba(0,0,0,0.02); border: 1.5px solid #f1f5f9;
+        }
+        .skill-bar-container { margin-bottom: 24px; }
+        .skill-bar-bg { height: 10px; background: #f1f5f9; border-radius: 20px; overflow: hidden; margin-top: 8px; }
+        .skill-bar-fill { height: 100%; background: #f59e0b; border-radius: 20px; transition: width 1s ease; }
+        .skill-chip { padding: 8px 18px; border-radius: 12px; background: #ecfdf5; color: #059669; border: 1.5px solid #d1fae5; font-weight: 700; font-size: 15px; text-transform: uppercase; }
+
+        .tab-btn { position: relative; padding: 14px 28px; font-weight: 800; font-size: 15px; color: #94a3b8; text-transform: uppercase; transition: 0.3s; }
+        .tab-btn.active { color: var(--sky-primary); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--sky-primary); border-radius: 10px; transition: background 0.5s ease; }
+
+        .btn-premium-nav {
+            background: #0f172a; color: white; padding: 12px 36px; border-radius: 14px;
+            font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.1em; box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2); transition: all 0.4s;
+        }
+        .btn-premium-nav:hover { background: var(--sky-primary); transform: translateY(-2px); }
+
+        .btn-premium-action {
+            /* Thay đổi nút sang màu động của Theme */
+            background: var(--sky-primary); color: white; padding: 14px 28px; border-radius: 20px;
+            font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.1em;
+            display: flex; align-items: center; gap: 12px; transition: all 0.4s; box-shadow: 0 10px 25px rgb(var(--color-primary-500) / 0.4); border: 1.5px solid rgba(255,255,255,0.2); position: relative; z-index: 200; cursor: pointer;
+        }
+        .btn-premium-action:hover { background: var(--oil-slate); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3); }
+
+        .animate-up { animation: fadeInUp 0.7s ease-out forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* --- CUSTOM DROPDOWN --- */
+        .role-list-item {
+            padding: 12px 16px; border-radius: 16px; margin-bottom: 4px;
+            font-size: 15px; font-weight: 700; color: #334155; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 12px;
+        }
+        .role-list-item:hover { background: rgb(var(--color-primary-50)); color: var(--sky-primary); transform: translateX(6px); }
+        .role-list-item.selected { background: linear-gradient(135deg, var(--sky-primary) 0%, #6366f1 100%); color: white; box-shadow: 0 4px 15px rgb(var(--color-primary-500) / 0.3); }
+        .role-list-item.selected i { color: white !important; }
+
+        /* --- STAIRCASE ANIMATIONS --- */
+        @keyframes drawStairEdge {
+            from { stroke-dashoffset: var(--stair-len); }
+            to { stroke-dashoffset: 0; }
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+
+<div class="bg-fixed-overlay" id="bgOverlay"></div>
+
+<div id="app" class="absolute inset-0 flex flex-col p-4 md:p-6 lg:p-8 overflow-hidden">
+    
+    <!-- Nút Theme Selector góc trái trên Page 1 -->
+    <div id="themeSelectorContainer" class="absolute top-6 left-6 md:top-8 md:left-8 z-[200]">
+        <div class="relative group">
+            <button id="themeTriggerBtn" class="bg-white/70 hover:bg-white backdrop-blur-md border border-slate-200/60 shadow-sm hover:shadow-md px-4 py-2.5 rounded-full text-slate-700 font-black text-[13px] uppercase tracking-widest transition-all flex items-center gap-2" onclick="toggleThemeMenu(event)">
+                <i data-lucide="palette" class="w-4 h-4 text-primary-600"></i> Theme
+            </button>
+            <!-- Dropdown menu chọn Theme -->
+            <div id="themeMenu" class="absolute top-full left-0 mt-3 w-48 bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl rounded-3xl overflow-hidden transition-all duration-300 origin-top opacity-0 scale-y-95 pointer-events-none p-2">
+                <button onclick="setTheme('default')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-colors"><span class="w-4 h-4 rounded-full bg-[#0ea5e9]"></span> Ocean Blue</button>
+                <button onclick="setTheme('emerald')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-colors"><span class="w-4 h-4 rounded-full bg-[#10b981]"></span> Emerald Green</button>
+                <button onclick="setTheme('violet')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-colors"><span class="w-4 h-4 rounded-full bg-[#8b5cf6]"></span> Royal Purple</button>
+                <button onclick="setTheme('rose')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-colors"><span class="w-4 h-4 rounded-full bg-[#f43f5e]"></span> Crimson Rose</button>
+                <button onclick="setTheme('amber')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl hover:bg-slate-50 text-slate-700 font-bold text-[13px] transition-colors"><span class="w-4 h-4 rounded-full bg-[#f59e0b]"></span> Sunset Amber</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo cố định góc phải -->
+    <img id="mainLogo" src="image/background/logo.png" alt="O&G Logo" class="absolute top-6 right-6 md:top-8 md:right-8 w-[120px] md:w-[170px] z-[100] object-contain pointer-events-none">
+
+    <!-- PAGE 1: SELECTION -->
+    <div id="page1" class="flex-1 flex flex-col items-center justify-center space-y-10 overflow-y-auto no-scrollbar">
+        <div class="text-center space-y-6 animate-up">
+            <div class="inline-flex items-center gap-2 bg-white/50 backdrop-blur px-6 py-2.5 rounded-full text-[15px] font-black uppercase tracking-widest border border-white shadow-sm">
+                <i data-lucide="shield-check" class="w-4 h-4 text-primary-600"></i> O&G Standards Verified
+            </div>
+            
+            <!-- Khung viền trắng bo phần text -->
+            <div class="bg-white/40 backdrop-blur-md border border-white shadow-2xl rounded-[3rem] p-6 md:p-12 max-w-4xl mx-auto">
+                <h1 class="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-slate-900 tracking-tighter mb-4 whitespace-nowrap">
+                    CAREER <span class="text-primary-600">PATHWAY</span>
+                </h1>
+                <p class="text-slate-700 font-medium text-[15px] md:text-lg max-w-xl mx-auto text-center">Định hướng nghề nghiệp và phát triển chuyên môn dầu khí</p>
+            </div>
+        </div>
+
+        <div class="glass-panel p-10 rounded-[48px] w-full max-w-md space-y-8 border-white shadow-2xl">
+            <div class="space-y-6">
+                <!-- Đã ẩn thẻ input type file -->
+                <div class="relative" id="customDropdownContainer">
+                    <label class="text-[15px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Lựa chọn Lộ trình (Path)</label>
+                    
+                    <!-- Nút Trigger Menu -->
+                    <button id="dropdownTrigger"
+                            class="w-full bg-white border border-slate-100 text-slate-900 rounded-3xl px-6 py-4 flex justify-between items-center focus:ring-4 focus:ring-primary-500/10 outline-none font-bold transition-all text-lg shadow-sm hover:shadow-md opacity-60 cursor-not-allowed animate-pulse">
+                        <span id="dropdownSelectedText" class="truncate pr-4 text-slate-400">Đang tải dữ liệu gốc...</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform duration-300 shrink-0" id="dropdownIcon"></i>
+                    </button>
+
+                    <!-- Khung Menu Xổ Lên (Dropup) -->
+                    <div id="dropdownMenu" class="absolute z-[200] bottom-full mb-3 left-0 w-full bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl rounded-3xl overflow-hidden transition-all duration-300 origin-bottom opacity-0 scale-y-95 pointer-events-none">
+                        <div class="p-3 border-b border-slate-100 bg-slate-50/80">
+                            <div class="relative">
+                                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                                <input type="text" id="roleSearchInput" placeholder="Tìm kiếm nhanh lộ trình..." 
+                                       class="w-full bg-white border border-slate-200 text-[15px] font-bold text-slate-700 rounded-2xl pl-10 pr-4 py-3 outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition-all placeholder:font-medium placeholder:text-slate-400">
+                            </div>
+                        </div>
+                        <ul id="customRoleList" class="max-h-[280px] overflow-y-auto custom-scrollbar p-2">
+                            <!-- Danh sách sẽ được JS Inject vào đây -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <button id="btnStart"
+                    class="w-full bg-primary-600 text-white font-black py-5 rounded-3xl shadow-xl shadow-primary-600/20 flex items-center justify-center gap-3 uppercase tracking-widest text-[15px] transition-all group opacity-60 cursor-not-allowed">
+                Bắt đầu tìm hiểu <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- PAGE 1.5: JOURNEY OVERVIEW -->
+    <div id="pageOverview" class="hidden h-full flex flex-col gap-6 animate-up overflow-hidden">
+        <div class="flex items-center justify-between shrink-0 px-2">
+            <button onclick="showPage(1)" class="group flex items-center gap-2 bg-white/70 hover:bg-white backdrop-blur-md border border-slate-200/60 shadow-sm hover:shadow-md px-5 py-2.5 rounded-full text-slate-700 hover:text-primary-600 font-black text-[15px] uppercase tracking-widest transition-all">
+                <i data-lucide="chevron-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300"></i> Trang chủ
+            </button>
+            <div class="text-center">
+                <div class="text-[15px] font-black text-primary-600 uppercase tracking-[0.4em] mb-1">Professional Growth Strategy</div>
+                <h2 id="ovTitle" class="text-2xl md:text-4xl font-black text-slate-900 uppercase tracking-tighter leading-none text-center">CAREER <span class="text-primary-600">ROADMAP</span></h2>
+            </div>
+            <button id="btnGoToDetail" class="btn-premium-action">
+                Chi tiết <i data-lucide="zap" class="w-4 h-4 text-white"></i>
+            </button>
+        </div>
+
+        <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0 overflow-hidden">
+            <div class="lg:col-span-9 relative flex flex-col order-1 h-full overflow-hidden">
+                <div class="roadmap-viewport" id="roadmapViewport">
+                    <div class="bg-grid-pattern"></div>
+                    <div class="waves-container"><div class="wave"></div><div class="wave wave2"></div></div>
+                    <div id="particleContainer"></div>
+                    <div class="roadmap-content" id="roadmapContent">
+                        
+                        <svg class="hidden">
+                            <defs>
+                                <linearGradient id="rainbowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#10b981" />
+                                    <stop offset="25%" stop-color="#0ea5e9" />
+                                    <stop offset="50%" stop-color="#6366f1" />
+                                    <stop offset="75%" stop-color="#d946ef" />
+                                    <stop offset="100%" stop-color="#f59e0b" />
+                                </linearGradient>
+                            </defs>
+                        </svg>
+
+                        <!-- LAYER BẬC THANG (STAIRCASE) -->
+                        <svg id="staircaseSvg" class="absolute top-0 left-0 w-full h-full pointer-events-none" style="z-index: 3;">
+                            <defs>
+                                <linearGradient id="stairGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color: rgba(99, 102, 241, 0.45);" /> 
+                                    <stop offset="100%" style="stop-color: rgba(14, 165, 233, 0.1);" />
+                                </linearGradient>
+                            </defs>
+                            <polygon id="stairPolygon" fill="url(#stairGradient)" class="opacity-0 transition-opacity duration-1000 delay-500" />
+                            <path id="stairEdge" fill="none" stroke="url(#rainbowGradient)" stroke-width="3.5" stroke-linejoin="miter" opacity="1" />
+                        </svg>
+
+                        <!-- ĐƯỜNG BAY DI CHUYỂN GỐC -->
+                        <svg id="journeyLine">
+                            <defs>
+                                <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:var(--sky-primary);stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <path id="svgPath" class="path-glow" d="" fill="none" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar (Phải) -->
+            <div class="lg:col-span-3 order-2 custom-scrollbar overflow-y-auto lg:h-full pb-6">
+                <div class="sidebar-container lg:h-full">
+                    <div class="job-family-badge group">
+                        <span class="text-[15px] font-black uppercase text-primary-100 tracking-widest block mb-2 opacity-80">Discipline Group</span>
+                        <h3 id="ovJobFamily" class="text-base md:text-xl font-bold leading-tight">---</h3>
+                        <i data-lucide="database" class="absolute -right-4 -bottom-4 w-20 h-20 text-white/10 group-hover:scale-110 transition-transform"></i>
+                    </div>
+
+                    <div class="glass-card-info">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="p-2 rounded-xl bg-primary-100 text-primary-600"><i data-lucide="trending-up" class="w-5 h-5"></i></div>
+                            <h4 class="text-[15px] font-black text-slate-900 uppercase tracking-widest">Cơ hội phát triển</h4>
+                        </div>
+                        <div id="ovDevOpp">---</div>
+                    </div>
+                    
+                    <div class="glass-card-info">
+                        <div class="flex items-center gap-3 mb-5">
+                            <!-- Đã đồng bộ icon này theo biến Theme -->
+                            <div class="p-2 rounded-xl bg-primary-100 text-primary-600"><i data-lucide="compass" class="w-5 h-5"></i></div>
+                            <h4 class="text-[15px] font-black text-slate-900 uppercase tracking-widest">Định hướng dài hạn</h4>
+                        </div>
+                        <div id="ovLongTerm">---</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAGE 2: DASHBOARD -->
+    <div id="page2" class="hidden h-full flex flex-col gap-4 animate-up overflow-hidden">
+        <div class="flex items-center justify-between shrink-0 px-2">
+            <button onclick="showPage(1.5)" class="group flex items-center gap-2 bg-white/70 hover:bg-white backdrop-blur-md border border-slate-200/60 shadow-sm hover:shadow-md px-5 py-2.5 rounded-full text-slate-700 hover:text-primary-600 font-black text-[15px] uppercase tracking-widest transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300"></i> Lộ trình
+            </button>
+            <div class="flex flex-col items-end">
+                <h2 id="detailFuncTitle" class="text-2xl font-black text-slate-900 uppercase tracking-tight text-right">---</h2>
+                <span id="detailJobFamily" class="bg-primary-600 text-white text-[15px] font-bold px-3 py-1 rounded-full uppercase tracking-widest mt-1">---</span>
+            </div>
+        </div>
+
+        <div class="flex-1 grid grid-cols-12 gap-6 overflow-hidden pb-4">
+            <div class="col-span-12 lg:col-span-3 glass-panel p-6 rounded-[32px] overflow-y-auto no-scrollbar flex lg:flex-col gap-2">
+                <h3 class="hidden lg:block text-[15px] font-black text-slate-400 uppercase tracking-widest mb-2 text-center">Lộ trình thăng tiến</h3>
+                <div class="detail-stepper-container flex lg:flex-col gap-2 w-full">
+                    <div id="progressLine" class="progress-line"></div>
+                    <div id="detailStepper" class="flex lg:flex-col gap-2 w-full relative z-10"></div>
+                </div>
+
+                <div class="sidebar-dynamic-card">
+                    <div class="mb-5">
+                        <div class="dynamic-header">
+                            <i data-lucide="zap" class="w-4 h-4"></i>
+                            <h4 class="text-[15px] font-black uppercase tracking-widest">Cơ hội thăng tiến</h4>
+                        </div>
+                        <div id="sidebarDevOpp" class="dynamic-content-list">---</div>
+                    </div>
+                    <div>
+                        <div class="dynamic-header">
+                            <i data-lucide="compass" class="w-4 h-4"></i>
+                            <h4 class="text-[15px] font-black uppercase tracking-widest">Định hướng lâu dài</h4>
+                        </div>
+                        <div id="sidebarLongTerm" class="dynamic-content-list">---</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-span-12 lg:col-span-9 flex flex-col glass-panel rounded-[32px] overflow-hidden">
+                <div class="p-8 bg-white/40 border-b border-slate-100">
+                    <div class="flex items-center gap-10">
+                        <div class="relative shrink-0">
+                            <div class="w-32 h-32 rounded-3xl bg-white shadow-xl flex items-center justify-center p-2 border border-slate-50 overflow-hidden">
+                                <img id="msIcon" src="" class="w-full h-full object-contain">
+                                <div id="msIconFallback" class="hidden text-slate-200"><i data-lucide="shield-check" class="w-20 h-20"></i></div>
+                            </div>
+                            <div id="msOrderBadge" class="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-lg border-4 border-white">1</div>
+                        </div>
+                        <div class="space-y-2">
+                            <span id="msLevelLabel" class="inline-block px-3 py-0.5 bg-primary-100 text-primary-600 font-black text-[15px] uppercase tracking-widest rounded-full">---</span>
+                            <h1 id="roleTitleLabel" class="text-3xl font-black text-slate-900 leading-tight">---</h1>
+                            <p id="rolePurposeLabel" class="text-slate-500 font-medium italic text-[15px] leading-relaxed max-w-2xl">---</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 px-10 border-b border-slate-100 bg-white/20 shrink-0 overflow-x-auto no-scrollbar">
+                    <button class="tab-btn active" onclick="switchTab('tab-works')">CÔNG VIỆC & KPI</button>
+                    <button class="tab-btn" onclick="switchTab('tab-skills')">NĂNG LỰC & KỸ NĂNG</button>
+                    <button class="tab-btn" onclick="switchTab('tab-learning')">ĐÀO TẠO & PHÁT TRIỂN</button>
+                    <button class="tab-btn" onclick="switchTab('tab-next')">TIÊU CHÍ THĂNG CẤP</button>
+                </div>
+
+                <div id="detailView" class="flex-1 overflow-y-auto p-10 custom-scrollbar">
+                    <div id="tab-works" class="tab-content animate-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-5 gap-12">
+                            <div class="lg:col-span-3">
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-primary-600"></i> Trách nhiệm</h4>
+                                <div id="responsibilitiesList" class="space-y-3"></div>
+                            </div>
+                            <div class="lg:col-span-2">
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="target" class="w-5 h-5 text-primary-600"></i> KPI chính</h4>
+                                <div id="kpiContainer" class="space-y-4"></div>
+                            </div>
+                        </div>
+                        <div class="mt-12 p-6 rounded-3xl bg-primary-50 border border-primary-100">
+                             <span class="text-[15px] font-black text-primary-600 uppercase mb-2 block">Phạm vi công việc</span>
+                             <p id="typicalScopeText" class="text-[15px] font-medium text-slate-700 italic leading-relaxed">---</p>
+                        </div>
+                    </div>
+
+                    <div id="tab-skills" class="tab-content hidden animate-up">
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                            <div class="lg:col-span-7">
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-8 flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-amber-500"></i> Năng lực chuyên môn</h4>
+                                <div id="competenciesContainer" class="space-y-6"></div>
+                            </div>
+                            <div class="lg:col-span-5">
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-8 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-emerald-600"></i> Kỹ năng hành vi</h4>
+                                <div id="behavioralContainer" class="flex flex-wrap gap-2.5 mb-10"></div>
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="wrench" class="w-5 h-5 text-slate-500"></i> Công cụ kỹ thuật</h4>
+                                <div id="toolsContainer" class="space-y-3"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-learning" class="tab-content hidden animate-up space-y-12">
+                        <div>
+                            <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="graduation-cap" class="w-5 h-5 text-primary-600"></i> Đào tạo gợi ý</h4>
+                            <div id="trainingList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+                        </div>
+                        <div>
+                            <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="award" class="w-5 h-5 text-amber-500"></i> Chứng chỉ khuyến nghị</h4>
+                            <div id="certList" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <div id="tab-next" class="tab-content hidden animate-up space-y-12">
+                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                             <div>
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600"></i> Dấu hiệu sẵn sàng (Readiness)</h4>
+                                <div id="readinessList" class="space-y-4"></div>
+                             </div>
+                             <div>
+                                <h4 class="text-slate-900 font-black uppercase tracking-widest text-[15px] mb-6 flex items-center gap-2"><i data-lucide="trending-up" class="w-5 h-5 text-primary-600"></i> Tiêu chí thăng cấp</h4>
+                                <div id="promotionList" class="space-y-4"></div>
+                             </div>
+                         </div>
+                         <div class="p-6 rounded-3xl bg-primary-50 border border-primary-100">
+                             <span class="text-[15px] font-black text-primary-600 uppercase mb-1 block">Vị trí mục tiêu tiếp theo</span>
+                             <p id="nextTargetRole" class="text-lg font-black text-slate-900 uppercase">---</p>
+                         </div>
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-slate-100 bg-white/40 flex items-center justify-between">
+                    <button id="prevBtn" class="text-[15px] font-black uppercase text-slate-400 hover:text-primary-600 transition-all flex items-center gap-2"><i data-lucide="chevron-left" class="w-5 h-5"></i> Trước</button>
+                    <div id="pageCounter" class="text-[15px] font-black text-slate-300">01 / 05</div>
+                    <button id="nextBtn" class="btn-premium-nav">Tiếp theo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[999] flex flex-col gap-3 pointer-events-none"></div>
+
+</div>
+
+<script>
+    let masterData = [];
+    let currentRoleMilestones = [];
+    let currentIdx = 0;
+    let animationLoopId = null;
+    let selectedRoleValue = ""; 
+    
+    let isFileLoaded = false;
+    let isRoleSelected = false;
+
+    // Palette màu tương ứng cho sự thăng tiến (Entry -> Goal)
+    const progressionColors = ['#10b981', '#0ea5e9', '#6366f1', '#8b5cf6', '#d946ef', '#f59e0b'];
+
+    lucide.createIcons();
+
+    const btnStart = document.getElementById('btnStart');
+    const bgOverlay = document.getElementById('bgOverlay');
+    const themeSelectorContainer = document.getElementById('themeSelectorContainer');
+    const logo = document.getElementById('mainLogo');
+    
+    const dropdownTrigger = document.getElementById('dropdownTrigger');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const dropdownIcon = document.getElementById('dropdownIcon');
+    const dropdownSelectedText = document.getElementById('dropdownSelectedText');
+    const customRoleList = document.getElementById('customRoleList');
+    const roleSearchInput = document.getElementById('roleSearchInput');
+
+    function showToast(message, type = 'warning') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+        
+        const toast = document.createElement('div');
+        toast.className = 'bg-white/95 backdrop-blur-xl border-l-4 border-amber-500 text-slate-800 px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-up pointer-events-auto';
+        toast.innerHTML = `
+            <div class="bg-amber-100 p-2 rounded-full shrink-0"><i data-lucide="alert-circle" class="w-5 h-5 text-amber-600"></i></div>
+            <span class="font-bold text-[15px]">${message}</span>
+        `;
+        
+        container.appendChild(toast);
+        lucide.createIcons();
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(20px)';
+            toast.style.transition = 'all 0.4s ease';
+            setTimeout(() => toast.remove(), 400);
+        }, 3000);
+    }
+
+    function toggleThemeMenu(e) {
+        if(e) e.stopPropagation();
+        const menu = document.getElementById('themeMenu');
+        const isOpen = menu.classList.contains('opacity-100');
+        if (isOpen) {
+            menu.classList.remove('opacity-100', 'scale-y-100', 'pointer-events-auto');
+            menu.classList.add('opacity-0', 'scale-y-95', 'pointer-events-none');
+        } else {
+            menu.classList.remove('opacity-0', 'scale-y-95', 'pointer-events-none');
+            menu.classList.add('opacity-100', 'scale-y-100', 'pointer-events-auto');
+        }
+    }
+
+    function setTheme(themeName) {
+        if(themeName === 'default') document.documentElement.removeAttribute('data-theme');
+        else document.documentElement.setAttribute('data-theme', themeName);
+        
+        toggleThemeMenu(); 
+    }
+
+    function getRoleIcon(roleName) {
+        const name = roleName.toLowerCase();
+        if (name.includes('hvac') || name.includes('mechanical') || name.includes('piping') || name.includes('equipment')) return 'wrench';
+        if (name.includes('electrical') || name.includes('eit') || name.includes('instrument')) return 'zap';
+        if (name.includes('hse') || name.includes('safety') || name.includes('fire') || name.includes('guard')) return 'shield-alert';
+        if (name.includes('plan') || name.includes('schedule')) return 'calendar-clock';
+        if (name.includes('qa') || name.includes('qc') || name.includes('quality') || name.includes('inspect')) return 'check-circle';
+        if (name.includes('manager') || name.includes('lead') || name.includes('coordinator') || name.includes('director')) return 'users';
+        if (name.includes('material') || name.includes('logistic')) return 'package';
+        if (name.includes('lift') || name.includes('scaffold') || name.includes('rigging') || name.includes('crane')) return 'construction';
+        if (name.includes('paint') || name.includes('blast') || name.includes('coat')) return 'paint-roller';
+        if (name.includes('commissioning') || name.includes('start')) return 'power';
+        if (name.includes('flange') || name.includes('weld') || name.includes('joint')) return 'link-2';
+        return 'briefcase'; 
+    }
+
+    // --- NEW: Tự động tải file Excel từ máy chủ thay vì bắt người dùng chọn ---
+    async function loadExcelDataAutomatically() {
+        try {
+            // Kiểm tra môi trường để tránh lỗi 'Failed to parse URL' khi chạy ở chế độ Preview (blob:) hoặc Local (file:)
+            const protocol = window.location.protocol;
+            if (protocol === 'blob:' || protocol === 'data:' || protocol === 'file:') {
+                console.warn("Fetch API không hỗ trợ tải file tương đối trong môi trường hiện tại:", protocol);
+                dropdownSelectedText.innerText = "Cần chạy trên Web Server (HTTP/HTTPS)";
+                dropdownTrigger.classList.remove('animate-pulse');
+                showToast('Tính năng tải tự động không chạy trong Preview. Vui lòng deploy lên Hosting/Server thật!');
+                return;
+            }
+
+            // Lấy trực tiếp file từ cùng thư mục
+            const response = await fetch('./career_path_master.xlsx');
+            if (!response.ok) throw new Error('Không tìm thấy file Excel');
+
+            const arrayBuffer = await response.arrayBuffer();
+            const data = new Uint8Array(arrayBuffer);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            const sheetName = workbook.SheetNames.find(n => n.includes('Data')) || workbook.SheetNames[0];
+            const raw = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+            let hIdx = 0;
+            for(let i=0; i<raw.length; i++) { if(raw[i] && raw[i].includes('function_title')) { hIdx = i; break; } }
+            masterData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { range: hIdx });
+            const roles = [...new Set(masterData.map(d => d.function_title))].filter(Boolean);
+            
+            customRoleList.innerHTML = '';
+            roles.sort().forEach(r => {
+                const li = document.createElement('li');
+                li.className = 'role-list-item group';
+                li.dataset.value = r;
+                const iconName = getRoleIcon(r);
+                li.innerHTML = `<i data-lucide="${iconName}" class="w-4 h-4 text-primary-500/50 group-hover:text-primary-600 transition-colors shrink-0"></i> <span>${r}</span>`;
+                li.onclick = (e) => {
+                    e.stopPropagation();
+                    selectCustomRole(r, li);
+                };
+                customRoleList.appendChild(li);
+            });
+            
+            isFileLoaded = true;
+            // Xóa hiệu ứng đang tải và mở nút Dropdown
+            dropdownTrigger.classList.remove('opacity-60', 'cursor-not-allowed', 'animate-pulse');
+            dropdownTrigger.classList.add('cursor-pointer');
+            
+            dropdownSelectedText.innerText = "-- Vui lòng Chọn Career Path --";
+            dropdownSelectedText.classList.replace('text-slate-900', 'text-slate-400');
+            lucide.createIcons();
+
+        } catch (error) {
+            console.error("Lỗi khi tải file:", error);
+            dropdownSelectedText.innerText = "Lỗi tải dữ liệu. Vui lòng tải lại trang.";
+            dropdownTrigger.classList.remove('animate-pulse');
+            showToast('Không thể tự động tải dữ liệu gốc. Kiểm tra lại kết nối!');
+        }
+    }
+
+    // Kích hoạt load dữ liệu ngay khi DOM sẵn sàng
+    document.addEventListener('DOMContentLoaded', loadExcelDataAutomatically);
+
+    dropdownTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        if (!isFileLoaded) {
+            showToast('Dữ liệu đang được tải, vui lòng đợi trong giây lát!');
+            return;
+        }
+
+        const isOpen = dropdownMenu.classList.contains('opacity-100');
+        if (isOpen) closeDropdown();
+        else openDropdown();
+    });
+
+    function openDropdown() {
+        dropdownMenu.classList.remove('opacity-0', 'scale-y-95', 'pointer-events-none');
+        dropdownMenu.classList.add('opacity-100', 'scale-y-100', 'pointer-events-auto');
+        dropdownIcon.classList.add('rotate-180');
+        roleSearchInput.value = ''; 
+        filterRoles('');
+        roleSearchInput.focus();
+    }
+
+    function closeDropdown() {
+        dropdownMenu.classList.remove('opacity-100', 'scale-y-100', 'pointer-events-auto');
+        dropdownMenu.classList.add('opacity-0', 'scale-y-95', 'pointer-events-none');
+        dropdownIcon.classList.remove('rotate-180');
+    }
+
+    function selectCustomRole(roleName, liElement) {
+        selectedRoleValue = roleName;
+        dropdownSelectedText.innerText = roleName;
+        dropdownSelectedText.classList.replace('text-slate-400', 'text-slate-900'); 
+        
+        isRoleSelected = true;
+        btnStart.classList.remove('opacity-60', 'cursor-not-allowed');
+        btnStart.classList.add('cursor-pointer', 'hover:bg-slate-950');
+        
+        document.querySelectorAll('.role-list-item').forEach(el => el.classList.remove('selected'));
+        if (liElement) liElement.classList.add('selected');
+        
+        closeDropdown();
+    }
+
+    roleSearchInput.addEventListener('input', (e) => filterRoles(e.target.value));
+    
+    function filterRoles(term) {
+        const lowerTerm = term.toLowerCase();
+        document.querySelectorAll('.role-list-item').forEach(li => {
+            const text = li.dataset.value.toLowerCase();
+            li.style.display = text.includes(lowerTerm) ? 'flex' : 'none';
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (dropdownTrigger && dropdownMenu && !dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            closeDropdown();
+        }
+        const themeMenu = document.getElementById('themeMenu');
+        const themeBtn = document.getElementById('themeTriggerBtn');
+        if (themeMenu && themeBtn && !themeMenu.contains(e.target) && !themeBtn.contains(e.target)) {
+            themeMenu.classList.remove('opacity-100', 'scale-y-100', 'pointer-events-auto');
+            themeMenu.classList.add('opacity-0', 'scale-y-95', 'pointer-events-none');
+        }
+    });
+
+    btnStart.addEventListener('click', () => {
+        if (!isFileLoaded) {
+            showToast('Dữ liệu đang được tải xuống, xin vui lòng đợi!');
+            return;
+        }
+        if (!isRoleSelected) {
+            showToast('Vui lòng chọn một Lộ trình (Path) để tiếp tục!');
+            return;
+        }
+
+        const role = selectedRoleValue;
+        currentRoleMilestones = masterData.filter(d => d.function_title === role).sort((a,b) => (Number(a.milestone_order) || 0) - (Number(b.milestone_order) || 0));
+        if(currentRoleMilestones.length > 0) { currentIdx = 0; showPage(1.5); }
+    });
+
+    function showPage(n) {
+        document.querySelectorAll('#app > div').forEach(div => div.classList.add('hidden'));
+        if (animationLoopId) cancelAnimationFrame(animationLoopId);
+
+        if (n === 1) {
+            if (logo) logo.classList.remove('hidden');
+            if (themeSelectorContainer) themeSelectorContainer.classList.remove('hidden');
+            document.getElementById('page1').classList.remove('hidden');
+            bgOverlay.style.backgroundImage = "linear-gradient(to bottom, rgba(248, 250, 252, 0.2), rgba(248, 250, 252, 0.2)), url('image/background/background_3.png')";
+        } else if (n === 1.5) {
+            if (logo) logo.classList.add('hidden');
+            if (themeSelectorContainer) themeSelectorContainer.classList.add('hidden');
+            document.getElementById('pageOverview').classList.remove('hidden');
+            bgOverlay.style.backgroundImage = "linear-gradient(to bottom, rgba(248, 250, 252, 0.5), rgba(248, 250, 252, 0.5)), url('image/background/background_4.png')";
+            setTimeout(renderOverview, 100);
+            initBackgroundParticles();
+        } else {
+            if (logo) logo.classList.add('hidden');
+            if (themeSelectorContainer) themeSelectorContainer.classList.add('hidden');
+            document.getElementById('page2').classList.remove('hidden');
+            bgOverlay.style.backgroundImage = "linear-gradient(to bottom, rgba(248, 250, 252, 0.5), rgba(248, 250, 252, 0.5)), url('image/background/background_2.png')";
+            renderDashboard();
+        }
+        lucide.createIcons();
+    }
+
+    function initBackgroundParticles() {
+        const container = document.getElementById('particleContainer');
+        if(!container) return; container.innerHTML = '';
+        const particleColors = ['#0ea5e9', '#10b981', '#8b5cf6', '#f59e0b', '#d946ef'];
+        for(let i=0; i<30; i++) {
+            const p = document.createElement('div'); p.className = 'ambient-particle';
+            const size = Math.random() * 6 + 3; 
+            p.style.width = `${size}px`; p.style.height = `${size}px`;
+            p.style.backgroundColor = particleColors[Math.floor(Math.random() * particleColors.length)];
+            p.style.left = `${Math.random() * 100}%`; p.style.bottom = `-50px`;
+            p.style.animationDelay = `${Math.random() * 15}s`; p.style.animationDuration = `${12 + Math.random() * 12}s`;
+            container.appendChild(p);
+        }
+    }
+
+    function renderOverview() {
+        const viewport = document.getElementById('roadmapViewport');
+        const content = document.getElementById('roadmapContent');
+        const svgPath = document.getElementById('svgPath');
+        if (!viewport || !content || !svgPath) return;
+        content.querySelectorAll('.path-node').forEach(n => n.remove());
+        const vWidth = viewport.clientWidth, vHeight = viewport.clientHeight;
+        if (vWidth < 100 || vHeight < 100) return;
+
+        const data = currentRoleMilestones, total = data.length, cardW = 180;
+        let masterScale = 1.0;
+        const reqH = (total + 1) * 125 + 160; 
+        if (vHeight < reqH) masterScale = Math.max(vHeight / reqH, 0.62);
+
+        const marginX = 10; 
+        const marginY = 60;
+        const startX = marginX + 15;
+        const startY = vHeight - marginY - 140; 
+        const endX = vWidth - marginX - cardW - 15;
+        const endY = marginY + 25;
+
+        const yOffset = 70;
+
+        const anchors = [];
+        for (let i = 0; i <= total; i++) {
+            const isSummit = (i === total), ratio = i / total;
+            
+            const x = startX + ratio * (endX - startX);
+            const y = startY + ratio * (endY - startY) - yOffset;
+            
+            anchors.push({ x: x + (cardW / 2), y: y + (isSummit ? 100 : 80) * masterScale, isSummit, index: i < total ? i : total - 1 });
+
+            const node = document.createElement('div');
+            node.className = `path-node`; node.id = isSummit ? `node-summit` : `node-${i}`;
+            node.style.left = `${x}px`; node.style.top = `${y}px`; node.style.width = `${cardW}px`;
+            node.onclick = () => { currentIdx = (i < total ? i : total - 1); renderDashboard(); showPage(2); };
+            
+            const nodeColor = isSummit ? '#f59e0b' : progressionColors[i % progressionColors.length];
+
+            if (!isSummit) {
+                const m = data[i];
+                node.innerHTML = `
+                <div class="node-card" style="transform: scale(${masterScale}); border-bottom: 3px solid ${nodeColor};">
+                    <div class="node-circle" style="background-color: ${nodeColor};">0${i+1}</div>
+                    <div class="node-icon-wrapper"><img src="${m.icon_image_path}" class="w-full h-full object-contain" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1063/1063376.png'"></div>
+                    <div class="text-center px-1 pb-2">
+                        <span class="text-[15px] font-black uppercase block mb-0.5" style="color: ${nodeColor};">${m.milestone_level}</span>
+                        <h5 class="text-[20px] font-extrabold text-slate-900 line-clamp-3 leading-tight">${m.role_title}</h5>
+                    </div>
+                </div>`;
+            } else {
+                const summitData = data[total - 1];
+                node.innerHTML = `
+                <div class="summit-halo" style="transform: translate(-50%, -50%) scale(${masterScale})"></div>
+                <div class="node-card summit-card shadow-xl !bg-amber-50" style="transform: scale(${masterScale}); border: 2px solid ${nodeColor};">
+                    <div class="summit-crown" style="background-color: ${nodeColor};"><i data-lucide="crown" class="w-4 h-4 text-white"></i></div>
+                    <div class="node-icon-wrapper !bg-amber-50/30"><img src="${summitData.icon_image_path || 'https://cdn-icons-png.flaticon.com/512/2618/2618245.png'}" class="w-full h-full object-contain"></div>
+                    <div class="text-center px-1 pb-2">
+                        <span class="text-[15px] font-black uppercase block mb-0.5" style="color: ${nodeColor};">Career Goal</span>
+                        <h5 class="text-[20px] font-black uppercase text-slate-900 line-clamp-3 leading-tight">${summitData.next_target_role || 'Executive'}</h5>
+                    </div>
+                </div>`;
+            }
+            content.appendChild(node);
+        }
+
+        setTimeout(() => {
+            const stairEdge = document.getElementById('stairEdge');
+            const stairPoly = document.getElementById('stairPolygon');
+
+            if(stairEdge && stairPoly) {
+                const gapFromCardBottom = 25 * masterScale; 
+
+                const getCardBottomY = (index) => {
+                    const ratio = index / total;
+                    const nodeY = startY + ratio * (endY - startY) - yOffset;
+                    const nodeEl = document.getElementById(index === total ? 'node-summit' : `node-${index}`);
+                    let cardHeight = 180; 
+                    if (nodeEl) {
+                        const cardEl = nodeEl.querySelector('.node-card');
+                        if (cardEl) cardHeight = cardEl.offsetHeight; 
+                    }
+                    return nodeY + (cardHeight / 2) + (cardHeight * masterScale / 2);
+                };
+
+                let stairPath = '';
+                let pts = [];
+
+                let currentX = -50; 
+                let currentY = getCardBottomY(0) + gapFromCardBottom;
+                
+                stairPath += `M ${currentX} ${currentY} `;
+                pts.push(`${currentX},${currentY}`);
+
+                for (let i = 0; i < anchors.length; i++) {
+                    let nextX = (i < anchors.length - 1) ? (anchors[i].x + anchors[i+1].x) / 2 : vWidth + 50;
+
+                    stairPath += `L ${nextX} ${currentY} `;
+                    pts.push(`${nextX},${currentY}`);
+
+                    if (i < anchors.length - 1) {
+                        currentY = getCardBottomY(i + 1) + gapFromCardBottom;
+                        stairPath += `L ${nextX} ${currentY} `;
+                        pts.push(`${nextX},${currentY}`);
+                    }
+                }
+
+                stairEdge.setAttribute('d', stairPath);
+
+                let polyPts = pts.join(' ') + ` ${vWidth + 50},${vHeight + 50} -50,${vHeight + 50}`;
+                stairPoly.setAttribute('points', polyPts);
+
+                const sLen = stairEdge.getTotalLength();
+                stairEdge.style.setProperty('--stair-len', sLen);
+
+                stairEdge.style.strokeDasharray = sLen;
+                stairEdge.style.animation = 'drawStairEdge 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards';
+
+                stairPoly.classList.remove('opacity-0');
+            }
+        }, 150); 
+
+        let dStr = `M ${anchors[0].x} ${anchors[0].y}`;
+        for (let i = 1; i < anchors.length; i++) {
+            const p1 = anchors[i-1], p2 = anchors[i], midX = (p1.x + p2.x) / 2, cy = Math.min(p1.y, p2.y) - (150 * masterScale);
+            dStr += ` Q ${midX} ${cy}, ${p2.x} ${p2.y}`;
+        }
+        svgPath.setAttribute('d', dStr);
+        const pathLen = svgPath.getTotalLength();
+        const moveTime = 9000, pauseTime = 1200;
+        let start = null;
+
+        function animate(now) {
+            if (!start) start = now;
+            let elapsed = (now - start) % (moveTime + pauseTime);
+            if (elapsed < moveTime) {
+                const progress = elapsed / moveTime, currentDist = progress * pathLen;
+                svgPath.style.strokeDasharray = `${currentDist} ${pathLen}`;
+                svgPath.style.opacity = "1";
+                let activeIdx = -1;
+                for(let i=0; i < anchors.length; i++) {
+                    const trig = (i / (anchors.length - 1)) * pathLen;
+                    if (currentDist >= trig - 20 && currentDist <= trig + 250) { activeIdx = i; break; }
+                }
+                content.querySelectorAll('.path-node').forEach((node, i) => {
+                    const card = node.querySelector('.node-card');
+                    if (i === activeIdx) card.classList.add(i === total ? 'summit-victory' : 'active-glow');
+                    else { card.classList.remove('active-glow', 'summit-victory'); }
+                });
+            } else {
+                svgPath.style.opacity = "0"; 
+                const scNode = document.getElementById('node-summit');
+                if (scNode) scNode.querySelector('.node-card').classList.add('summit-victory');
+                for(let i=0; i<total; i++) { const n = document.getElementById(`node-${i}`); if(n) n.querySelector('.node-card').classList.remove('active-glow'); }
+                if (elapsed > (moveTime + pauseTime - 100)) if (scNode) scNode.querySelector('.node-card').classList.remove('summit-victory');
+            }
+            animationLoopId = requestAnimationFrame(animate);
+        }
+        animationLoopId = requestAnimationFrame(animate);
+
+        const summitData = data[total - 1];
+        const elJ = document.getElementById('ovJobFamily'); if(elJ) elJ.innerText = summitData.job_family || '---';
+        formatSidebarList('ovDevOpp', summitData.development_opportunity, false);
+        formatSidebarList('ovLongTerm', summitData.long_term_direction, false);
+        lucide.createIcons();
+        setTimeout(() => content.querySelectorAll('.path-node').forEach(n => n.classList.add('show')), 50);
+    }
+
+    function renderDashboard() {
+        const data = currentRoleMilestones[currentIdx];
+        if(!data) return;
+
+        const elFunc = document.getElementById('detailFuncTitle'); if(elFunc) elFunc.innerText = data.function_title;
+        const elJob = document.getElementById('detailJobFamily'); if(elJob) elJob.innerText = data.job_family || '---';
+        const elMsLvl = document.getElementById('msLevelLabel'); if(elMsLvl) elMsLvl.innerText = data.milestone_level;
+        const elTitle = document.getElementById('roleTitleLabel'); if(elTitle) elTitle.innerText = data.role_title;
+        const elPurpose = document.getElementById('rolePurposeLabel'); if(elPurpose) elPurpose.innerText = data.role_purpose || '---';
+        const elIcon = document.getElementById('msIcon'); if(elIcon) elIcon.src = data.icon_image_path || 'https://cdn-icons-png.flaticon.com/512/1063/1063376.png';
+        const elBadge = document.getElementById('msOrderBadge'); if(elBadge) elBadge.innerText = currentIdx + 1;
+
+        formatSidebarListDynamic('sidebarDevOpp', data.development_opportunity);
+        formatSidebarListDynamic('sidebarLongTerm', data.long_term_direction);
+
+        const stepper = document.getElementById('detailStepper');
+        if(stepper) {
+            stepper.innerHTML = '';
+            currentRoleMilestones.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = `dashboard-stepper-item ${i === currentIdx ? 'active' : (i < currentIdx ? 'completed' : '')}`;
+                div.innerHTML = `<div class="stepper-num">${i+1}</div><div class="flex flex-col"><span class="text-[15px] font-black uppercase text-slate-400">${m.milestone_level}</span><span class="text-[15px] font-bold text-slate-800 leading-tight pr-2">${m.role_title}</span></div>`;
+                div.onclick = () => { currentIdx = i; renderDashboard(); };
+                stepper.appendChild(div);
+            });
+        }
+        const pLine = document.getElementById('progressLine'); if(pLine) pLine.style.height = `${(currentIdx / (currentRoleMilestones.length - 1)) * 100}%`;
+
+        renderBulletList('responsibilitiesList', data.key_responsibilities, 'check-circle-2', 'primary', true);
+        const kpiList = document.getElementById('kpiContainer');
+        if(kpiList) {
+            kpiList.innerHTML = '';
+            if(data.key_outputs_kpis) data.key_outputs_kpis.split(/[\n•·-]/).filter(s => s.trim().length > 5).forEach(kpi => {
+                const card = document.createElement('div'); card.className = "bg-primary-50/50 p-4 rounded-2xl border border-primary-100 flex items-center gap-3";
+                card.innerHTML = `<div class="w-2 h-2 rounded-full bg-primary-500"></div><span class="text-[15px] font-bold text-slate-700">${kpi.trim()}</span>`;
+                kpiList.appendChild(card);
+            });
+        }
+
+        const compCon = document.getElementById('competenciesContainer');
+        if(compCon) {
+            compCon.innerHTML = '';
+            if(data.competencies_to_develop) data.competencies_to_develop.split(/[\n•·-]/).filter(s => s.trim().length > 3).forEach((item, i) => {
+                const lvl = [86, 75, 96, 65, 80][i % 5];
+                const div = document.createElement('div'); div.className = "skill-bar-container";
+                div.innerHTML = `<div class="flex justify-between text-[15px] font-black uppercase text-slate-500"><span>${item.trim()}</span><span>${lvl}%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width: ${lvl}%"></div></div>`;
+                compCon.appendChild(div);
+            });
+        }
+        const behCon = document.getElementById('behavioralContainer');
+        if(behCon) {
+            behCon.innerHTML = '';
+            if(data.behavioral_leadership_skills) data.behavioral_leadership_skills.split(/[\n•·,]/).filter(s => s.trim().length > 3).forEach(skill => {
+                const chip = document.createElement('div'); chip.className = "skill-chip"; chip.innerText = skill.trim(); behCon.appendChild(chip);
+            });
+        }
+        const toolCon = document.getElementById('toolsContainer');
+        if(toolCon) {
+            toolCon.innerHTML = '';
+            if(data.technical_skills_tools) data.technical_skills_tools.split(/[\n•·-]/).filter(s => s.trim().length > 3).forEach(tool => {
+                const item = document.createElement('div'); item.className = "tool-list-item";
+                item.innerHTML = `<i data-lucide="chevron-right" class="w-4 h-4 text-primary-500"></i><span class="text-[15px]">${tool.trim()}</span>`; toolCon.appendChild(item);
+            });
+        }
+
+        renderBulletList('trainingList', data.suggested_training_development, 'graduation-cap', 'primary');
+        renderBulletList('readinessList', data.readiness_indicators, 'check-circle-2', 'emerald');
+        renderBulletList('promotionList', data.promotion_criteria, 'trending-up', 'indigo');
+        const elNext = document.getElementById('nextTargetRole'); if(elNext) elNext.innerText = data.next_target_role || '---';
+        const elScope = document.getElementById('typicalScopeText'); if(elScope) elScope.innerText = data.typical_scope || '---';
+        const certCon = document.getElementById('certList'); if(certCon) {
+            certCon.innerHTML = '';
+            if(data.recommended_certifications) data.recommended_certifications.split(/[\n•·,]/).filter(s => s.trim().length > 2).forEach(c => {
+                 const chip = document.createElement('div'); chip.className = "px-4 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-100 font-bold text-[15px]";
+                 chip.innerText = c.trim(); certCon.appendChild(chip);
+            });
+        }
+
+        const elCnt = document.getElementById('pageCounter'); if(elCnt) elCnt.innerText = `${String(currentIdx+1).padStart(2, '0')} / ${String(currentRoleMilestones.length).padStart(2, '0')}`;
+        const bPrev = document.getElementById('prevBtn'); if(bPrev) bPrev.onclick = () => { if(currentIdx > 0) { currentIdx--; renderDashboard(); } };
+        
+        const bNext = document.getElementById('nextBtn'); 
+        if(bNext) {
+            bNext.onclick = () => { 
+                if(currentIdx < currentRoleMilestones.length - 1) { 
+                    currentIdx++; 
+                    renderDashboard(); 
+                } else {
+                    showPage(1); 
+                }
+            };
+            bNext.innerText = currentIdx === currentRoleMilestones.length - 1 ? 'KẾT THÚC' : 'Tiếp theo';
+        }
+
+        lucide.createIcons();
+    }
+
+    function formatSidebarList(id, text, isDynamicSidebar = false) {
+        const container = document.getElementById(id); if(!container) return;
+        if(!text) { container.innerHTML = '<span class="text-[15px] italic opacity-60">N/A</span>'; return; }
+        const items = text.split(/[\n•·-]/).filter(s => s.trim().length > 5); container.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div'); 
+            div.className = 'info-item-list';
+            div.innerHTML = `<div class="dot"></div><span>${item.trim()}</span>`; 
+            container.appendChild(div);
+        });
+    }
+
+    function formatSidebarListDynamic(id, text) {
+        const container = document.getElementById(id); if(!container) return;
+        if(!text) { container.innerHTML = '<div class="text-[15px] italic opacity-60">N/A</div>'; return; }
+        const items = text.split(/[\n•·-]/).filter(s => s.trim().length > 5); container.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div'); 
+            div.className = 'dynamic-bullet';
+            div.innerHTML = `<div class="white-dot"></div><span class="dynamic-content-list">${item.trim()}</span>`; 
+            container.appendChild(div);
+        });
+    }
+
+    function renderBulletList(id, text, icon, color, isResp = false) {
+        const el = document.getElementById(id); if (!el) return; el.innerHTML = '';
+        if(!text) return el.innerHTML = '<div class="text-slate-400 italic text-[15px]">N/A</div>';
+        text.split(/[\n•·-]/).filter(s => s.trim().length > 3).forEach(item => {
+            const li = document.createElement('div');
+            li.className = isResp ? "responsibility-card" : "flex gap-4 items-start bg-white/60 p-4 rounded-2xl border border-slate-50 shadow-sm mb-3";
+            li.innerHTML = `<i data-lucide="${icon}" class="w-5 h-5 text-${color}-600 mt-0.5 shrink-0"></i> <span class="text-[15px] font-medium text-slate-700 leading-relaxed">${item.trim()}</span>`;
+            el.appendChild(li);
+        });
+    }
+
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        const target = document.getElementById(id); if(target) target.classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        if(event) event.target.classList.add('active');
+        lucide.createIcons();
+    }
+
+    const observer = new ResizeObserver(() => { if(!document.getElementById('pageOverview').classList.contains('hidden')) renderOverview(); });
+    observer.observe(document.body);
+    document.getElementById('btnGoToDetail').addEventListener('click', () => showPage(2));
+    showPage(1);
+</script>
+
+</body>
+</html>
